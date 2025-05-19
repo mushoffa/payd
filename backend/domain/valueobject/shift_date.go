@@ -2,8 +2,14 @@ package valueobject
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
+)
+
+var (
+	ErrInvalidDate       = errors.New("Invalid date")
+	ErrInvalidDateFormat = errors.New("Invalid date format")
 )
 
 type ShiftDate struct {
@@ -24,9 +30,20 @@ func (d *ShiftDate) UnmarshalJSON(b []byte) error {
 
 	t, err := time.Parse("2006-01-02", s)
 	if err != nil {
-		return fmt.Errorf("failed to parse time: %w", err)
+		return ErrInvalidDateFormat
 	}
 
 	d.T = t
+	return nil
+}
+
+func (d *ShiftDate) Validate() error {
+	today := time.Now()
+
+	before := d.T.Before(today)
+	if before {
+		return ErrInvalidDate
+	}
+
 	return nil
 }
