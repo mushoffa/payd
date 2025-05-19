@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"  
+  	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+  	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+  		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd
+  		http://www.liquibase.org/xml/ns/dbchangelog-ext
+  		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+  	<changeSet id="001-1" author="Mushoffa">
+  		<preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="shifts"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="shifts">
+        	<column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_shifts"/>
+            </column>
+            <column name="created" type="TIMESTAMP WITH TIMEZONE" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="updated" type="TIMESTAMP WITH TIMEZONE" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="date" type="DATE"/>
+            <column name="start_time" type="TIMESTAMP WITH TIMEZONE"/>
+            <column name="end_time" type="TIMESTAMP WITH TIMEZONE"/>
+            <column name="role" type="VARCHAR(25)"/>
+            <column name="location" type="VARCHAR(30)"/>
+            <column name="assigned" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="employee_name" type="VARCHAR(30)"/>
+            <column name="employee_id" type="BIGINT"/>
+        </createTable>
+  	</changeSet>
+
+    <changeSet id="001-2" author="Mushoffa">
+        <createIndex tableName="shifts" indexName="shifts_idx">
+            <column name="date"/>
+            <column name="assigned"/>
+            <column name="employee_name"/>
+            <column name="employee_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="001-3" author="Mushoffa">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="shift_requests"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="shift_requests">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_shift_requests"/>
+            </column>
+            <column name="created" type="TIMESTAMP WITH TIMEZONE" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="updated" type="TIMESTAMP WITH TIMEZONE" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="status" type="VARCHAR(15)"/>
+            <column name="request_by" type="VARCHAR(30)"/>
+            <column name="shift_id" type="BIGINT"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="shift_requests" baseColumnNames="shift_id" constraintName="FK_SHIFT_REQUESTS_ON_SHIFTS" referencedTableName="shifts" referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="001-4" author="Mushoffa">
+        <createIndex tableName="shift_requests" indexName="shift_requests_idx">
+            <column name="status"/>
+            <column name="request_by"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
