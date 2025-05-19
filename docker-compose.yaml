@@ -1,0 +1,33 @@
+version: "3.8"
+services:
+  database:
+    image: postgres
+    container_name: payd-db
+    restart: unless-stopped
+    ports:
+      - 5442:5432
+    environment:
+      - POSTGRES_DB=payd
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+    volumes:
+      - ./database/data:/var/lib/postgresql/data
+    networks:
+      - payd-net
+
+  liquibase:
+    image: liquibase/liquibase:latest
+    container_name: payd-migration
+    depends_on:
+      database:
+        condition: service_healthy 
+    command: --defaults-file=/liquibase/liquibase.properties update
+    volumes:
+      - ./database/liquibase.properties:/liquibase/liquibase.properties
+      - ./database/migration:/liquibase/changelog
+    networks:
+      - payd-net
+
+networks:
+  payd-net:
+    driver: bridge
