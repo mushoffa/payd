@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"  
+  	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+  	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+  		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd
+  		http://www.liquibase.org/xml/ns/dbchangelog-ext
+  		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="002-1" author="Mushoffa">
+        <dropIndex tableName="shift_requests" indexName="shift_requests_idx"/>
+    </changeSet>
+
+    <changeSet id="002-2" author="Mushoffa">
+        <renameColumn tableName="shift_requests" oldColumnName="request_by" newColumnName="employee_name"/>
+    </changeSet>
+
+    <changeSet id="002-3" author="Mushoffa">
+        <addColumn tableName="shift_requests">
+            <column name="employee_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="002-4" author="Mushoffa">
+        <createIndex tableName="shift_requests" indexName="shift_requests_idx">
+            <column name="status"/>
+            <column name="employee_id"/>
+            <column name="employee_name"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

@@ -9,4 +9,5 @@
   		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
   	<include file="./001_create_shifts_table.xml"/>
+  	<include file="./002_update_shifts_table.xml"/>
 </databaseChangeLog>
