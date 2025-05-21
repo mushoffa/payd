@@ -20,12 +20,14 @@ var (
 )
 
 type Shift struct {
-	ID        int
-	Date      valueobject.ShiftDate
-	StartTime valueobject.ShiftTime
-	EndTime   valueobject.ShiftTime
-	Role      string
-	Location  string
+	ID           int
+	Date         valueobject.ShiftDate
+	StartTime    valueobject.ShiftTime
+	EndTime      valueobject.ShiftTime
+	Role         string
+	Location     string
+	EmployeeID   int
+	EmployeeName string
 }
 
 func NewShift(date valueobject.ShiftDate, s_time, e_time valueobject.ShiftTime, role, loc string) Shift {
