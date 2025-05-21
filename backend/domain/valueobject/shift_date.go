@@ -16,6 +16,10 @@ type ShiftDate struct {
 	T time.Time
 }
 
+func NewShiftDate(t time.Time) *ShiftDate {
+	return &ShiftDate{t}
+}
+
 func (d *ShiftDate) String() string {
 	y, m, day := d.T.Date()
 	return fmt.Sprintf("%d-%02d-%02d", y, m, day)
@@ -38,7 +42,8 @@ func (d *ShiftDate) UnmarshalJSON(b []byte) error {
 }
 
 func (d *ShiftDate) Validate() error {
-	today := time.Now()
+	now := time.Now()
+	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
 
 	before := d.T.Before(today)
 	if before {
