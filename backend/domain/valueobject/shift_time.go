@@ -16,7 +16,11 @@ type ShiftTime struct {
 	T time.Time
 }
 
-func (d *ShiftTime) String() string {
+func NewShiftTime(t time.Time) ShiftTime {
+	return ShiftTime{t}
+}
+
+func (d ShiftTime) String() string {
 	h, m, _ := d.T.Clock()
 	return fmt.Sprintf("%02d:%02d", h, m)
 }
