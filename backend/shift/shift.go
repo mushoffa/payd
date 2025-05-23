@@ -1,14 +1,14 @@
 package shift
 
 import (
-	"payd/infrastructure/database"
-	"payd/infrastructure/http"
+	"payd/infrastructure"
 	"payd/shift/handler"
-
-	"github.com/jackc/pgx/v5"
+	"payd/shift/infrastructure/repository"
 )
 
-func New(server http.HttpServer, db database.DatabaseService[*pgx.Conn]) {
-	s := server.GetInstance()
-	handler.ShiftRouter(s)
+func New(infra *infrastructure.Infrastructure) {
+	server := infra.HttpServer.GetInstance()
+	database := infra.Database
+	r := repository.NewShiftsRepository(database)
+	handler.ShiftRouter(server, r)
 }
