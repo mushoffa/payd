@@ -23,6 +23,14 @@ type HttpServer interface {
 type server struct {
 	instance *fiber.App
 	port     int
+	routes   router
+}
+
+type router struct {
+	v1 fiber.Router
+	// Extend the version api router here:
+	//   v2 fiber.Router
+	// Add new router(s) accordingly at instantiation function
 }
 
 func NewServer(port int) HttpServer {
@@ -36,16 +44,23 @@ func NewServer(port int) HttpServer {
 	app.Use(logger.New())
 	app.Use(middleware.ErrorHandler)
 
+	// Router
+	api := app.Group("/api")
+	v1 := api.Group("/v1")
+
+	r := router{
+		v1: v1,
+	}
+
 	return &server{
 		instance: app,
 		port:     port,
+		routes:   r,
 	}
 }
 
 func (s *server) AddRoute(name string, router *fiber.App) {
-	api := s.instance.Group("/api")
-	v1 := api.Group("/v1")
-	v1.Mount(name, router)
+	s.routes.v1.Mount(name, router)
 }
 
 func (s *server) Start() error {
@@ -57,7 +72,6 @@ func (s *server) Start() error {
 }
 
 func (s *server) Shutdown(ctx context.Context) error {
-	fmt.Println("Shutdown")
 	if err := s.instance.ShutdownWithContext(ctx); err != nil {
 		fmt.Println("Err: ", err)
 		return err
