@@ -1,8 +1,12 @@
 package http
 
 import (
+	"payd/infrastructure/http/server/middleware"
+
 	"github.com/gofiber/fiber/v2"
 )
+
+var validator = middleware.NewValidator()
 
 type response struct {
 	Code    string      `json:"code,omitempty"`
@@ -11,6 +15,27 @@ type response struct {
 }
 
 type FiberHandler struct {
+}
+
+func (h *FiberHandler) ValidateBody(c *fiber.Ctx, body interface{}) error {
+	if err := c.BodyParser(body); err != nil {
+		return err
+	}
+
+	if err := validator.Struct(body); err != nil {
+		h.BadRequest(c, err.Error())
+		return err
+	}
+
+	return nil
+}
+
+func (h *FiberHandler) Success(c *fiber.Ctx, data interface{}) error {
+	return c.Status(fiber.StatusOK).JSON(h.SuccessResponse(data))
+}
+
+func (h *FiberHandler) Created(c *fiber.Ctx, data interface{}) error {
+	return c.Status(fiber.StatusCreated).JSON(h.SuccessResponse(data))
 }
 
 func (h *FiberHandler) SuccessResponse(data interface{}) response {
@@ -26,7 +51,6 @@ func (h *FiberHandler) SuccessResponse(data interface{}) response {
 	return r
 }
 
-func (h *FiberHandler) Success(c *fiber.Ctx, data interface{}) error {
-	r := h.SuccessResponse(data)
-	return c.Status(fiber.StatusOK).JSON(r)
+func (h *FiberHandler) BadRequest(c *fiber.Ctx, data interface{}) error {
+	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": data})
 }
