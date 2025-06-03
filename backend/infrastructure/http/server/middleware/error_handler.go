@@ -17,7 +17,9 @@ func ErrorHandler(c *fiber.Ctx) error {
 			})
 		}
 
-		return c.Status(fiber.StatusInternalServerError).JSON(err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": err.Error(),
+		})
 	}
 
 	return nil
