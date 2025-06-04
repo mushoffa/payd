@@ -10,4 +10,5 @@
 
   	<include file="./001_create_shifts_table.xml"/>
   	<include file="./002_update_shifts_table.xml"/>
+  	<include file="./003_create_employees_table.xml"/>
 </databaseChangeLog>

@@ -18,9 +18,9 @@ services:
   liquibase:
     image: liquibase/liquibase:latest
     container_name: payd-migration
-    depends_on:
-      database:
-        condition: service_healthy 
+    #depends_on:
+    #  database:
+    #    condition: service_healthy 
     command: --defaults-file=/liquibase/liquibase.properties update
     volumes:
       - ./database/liquibase.properties:/liquibase/liquibase.properties
