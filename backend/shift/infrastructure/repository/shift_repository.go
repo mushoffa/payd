@@ -1,0 +1,116 @@
+package repository
+
+import (
+	"context"
+
+	"payd/infrastructure/database"
+	"payd/shift/domain/entity"
+	"payd/shift/domain/repository"
+	"payd/shift/domain/valueobject"
+
+	"github.com/jackc/pgx/v5"
+)
+
+type shifts struct {
+	db database.DatabaseService[*pgx.Conn]
+}
+
+func NewShiftsRepository(db database.DatabaseService[*pgx.Conn]) domain.ShiftRepository {
+	return &shifts{db}
+}
+
+func (r *shifts) Create(shift *entity.Shift) (int, error) {
+	var id int
+
+	date := shift.Date.Time()
+	start_time := shift.StartTime.Time()
+	end_time := shift.EndTime.Time()
+	role := shift.Role
+	location := shift.Location
+
+	sql := `insert into shifts(date, start_time, end_time, role, location) values($1,$2,$3,$4,$5) returning id;`
+	if err := r.conn().QueryRow(context.Background(), sql, date, start_time, end_time, role, location).Scan(&id); err != nil {
+		return 0, err
+	}
+
+	return id, nil
+}
+
+func (r *shifts) FindAll() ([]entity.Shift, error) {
+	var shifts []entity.Shift
+
+	sql := `select * from shifts order by date`
+	rows, err := r.conn().Query(context.Background(), sql)
+	if err != nil {
+		return shifts, err
+	}
+
+	tables, err := pgx.CollectRows(rows, pgx.RowToStructByName[ShiftTable])
+	if err != nil {
+		return shifts, err
+	}
+
+	for _, table := range tables {
+
+		shift := entity.Shift{
+			ID:        table.ID,
+			Date:      valueobject.ShiftDate(table.Date),
+			StartTime: valueobject.ShiftTime(table.StartTime),
+			EndTime:   valueobject.ShiftTime(table.EndTime),
+			Role:      table.Role,
+			Location:  table.Location,
+		}
+
+		shifts = append(shifts, shift)
+	}
+
+	return shifts, nil
+}
+
+func (r *shifts) FindByID(id int) (entity.Shift, error) {
+	var shift entity.Shift
+
+	sql := `select * from shifts where id=$1`
+	row, queryErr := r.conn().Query(context.Background(), sql, id)
+	if queryErr != nil {
+		return shift, queryErr
+	}
+
+	table, err := pgx.CollectOneRow(row, pgx.RowToStructByName[ShiftTable])
+	if err != nil {
+		return shift, err
+	}
+
+	shift.ID = table.ID
+	shift.Date = valueobject.ShiftDate(table.Date)
+	shift.StartTime = valueobject.ShiftTime(table.StartTime)
+	shift.EndTime = valueobject.ShiftTime(table.EndTime)
+	shift.Role = table.Role
+	shift.Location = table.Location
+	if table.EmployeeName != nil {
+		shift.EmployeeName = *table.EmployeeName
+	}
+
+	if table.EmployeeName != nil {
+		shift.EmployeeID = *table.EmployeeID
+	}
+
+	return shift, nil
+}
+
+func (r *shifts) Update(shift *entity.Shift) error {
+	return nil
+}
+
+func (r *shifts) Delete(id int) error {
+	sql := `delete from shifts where id=$1`
+	_, err := r.conn().Exec(context.Background(), sql, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *shifts) conn() *pgx.Conn {
+	return r.db.GetInstance()
+}
