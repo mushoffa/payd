@@ -1,14 +1,10 @@
 package main
 
 import (
-	"payd/infrastructure"
-	"payd/shift"
+	"payd/application"
 )
 
 func main() {
-	i := infrastructure.New()
-
-	shift.New(i)
-	i.RunWebServer()
-	i.CloseDatabase()
+	app := application.New()
+	app.Run()
 }
