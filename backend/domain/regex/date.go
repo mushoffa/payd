@@ -26,6 +26,7 @@ var (
 	ErrInvalidDateFormat = errors.New("Invalid date format")
 )
 
+// Date returns error [ErrInvalidDateFormat] if input date format is invalid, otherwise nil
 func Date(date string) error {
 	regex := fmt.Sprintf("%s|%s|%s|%s", ddmmyyyy_s, ddmmyyyy_d, yyyymmdd_s, yyyymmdd_d)
 	pattern := regexp.MustCompile(regex)
