@@ -4,14 +4,13 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func getAllShifts() fiber.Handler {
+func (h *shift) getAll() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		return c.Status(fiber.StatusCreated).JSON("")
+		shifts, err := h.r.FindAll()
+		if err != nil {
+			return err
+		}
+
+		return h.Success(c, shifts)
 	}
-}
-
-type get_shifts_request struct {
-}
-
-type get_shifts_response struct {
 }

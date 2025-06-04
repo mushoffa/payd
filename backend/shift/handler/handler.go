@@ -1,17 +1,30 @@
 package handler
 
 import (
+	"payd/infrastructure/http/server"
+	"payd/shift/domain/repository"
+
 	"github.com/gofiber/fiber/v2"
 )
 
-func ShiftRouter(app fiber.Router) {
-	api := app.Group("/api")
-	v1 := api.Group("/v1")
-	shifts := v1.Group("/shifts")
+type shift struct {
+	http.FiberHandler
+	r domain.ShiftRepository
+}
 
-	shifts.Post("/", createShift())
-	shifts.Get("/", getAllShifts())
-	shifts.Get("/:id", getShiftByID())
-	shifts.Put("/:id", updateShift())
-	shifts.Delete("/:id", deleteShift())
+func NewShiftHandler(r domain.ShiftRepository) *shift {
+	return &shift{r: r}
+}
+
+func Routes(r domain.ShiftRepository) *fiber.App {
+	shifts := fiber.New()
+
+	shift := NewShiftHandler(r)
+	shifts.Post("/", shift.create())
+	shifts.Get("/", shift.getAll())
+	shifts.Get("/:id", shift.getByID())
+	shifts.Put("/:id", shift.update())
+	shifts.Delete("/:id", shift.delete())
+
+	return shifts
 }

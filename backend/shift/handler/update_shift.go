@@ -4,7 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func updateShift() fiber.Handler {
+func (h *shift) update() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusCreated).JSON("")
 	}
