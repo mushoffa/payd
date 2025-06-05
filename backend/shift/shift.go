@@ -6,10 +6,9 @@ import (
 	"payd/shift/infrastructure/repository"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/jackc/pgx/v5"
 )
 
-func New(database database.DatabaseService[*pgx.Conn]) *fiber.App {
+func New(database database.DatabaseService) *fiber.App {
 	r := repository.NewShiftsRepository(database)
 	return handler.Routes(r)
 }
