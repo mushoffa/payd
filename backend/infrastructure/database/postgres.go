@@ -2,16 +2,18 @@ package database
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type postgres struct {
-	client *pgx.Conn
+	client *pgxpool.Pool
 }
 
-func NewPostgresClient(username, password, url string, port int, dbName string, ssl bool) DatabaseService[*pgx.Conn] {
+func NewPostgres(username, password, url string, port int, dbName string, ssl bool) DatabaseService {
 	sslMode := "disable"
 
 	if ssl {
@@ -20,18 +22,94 @@ func NewPostgresClient(username, password, url string, port int, dbName string, 
 
 	db := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=%s", username, password, url, port, dbName, sslMode)
 
-	conn, err := pgx.Connect(context.Background(), db)
+	pool, err := pgxpool.New(context.Background(), db)
 	if err != nil {
 		panic(err)
 	}
 
-	return &postgres{conn}
+	return &postgres{pool}
 }
 
-func (db *postgres) GetInstance() *pgx.Conn {
-	return db.client
+func (db *postgres) Insert(ctx context.Context, sql string, args ...any) (int, error) {
+	var id int
+
+	row, err := db.QueryOne(ctx, sql, args)
+	if err != nil {
+		return 0, err
+	}
+
+	row.(pgx.Row).Scan(&id)
+
+	return id, nil
+}
+
+func (db *postgres) QueryOne(ctx context.Context, sql string, args ...any) (any, error) {
+	row := db.client.QueryRow(ctx, sql, args)
+	return row, nil
+}
+
+func (db *postgres) QueryMany(ctx context.Context, sql string, args ...any) (any, error) {
+	rows, err := db.client.Query(ctx, sql, args)
+	if err != nil {
+		return nil, err
+	}
+	return rows, nil
+}
+
+func (db *postgres) Exec(ctx context.Context, sql string, args ...any) (any, error) {
+	res, err := db.client.Exec(ctx, sql, args)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (db *postgres) Lock(ctx context.Context, id int) error {
+	const sql = `select pg_try_advisory_lock=$1`
+
+	locked, err := db.mutex(ctx, sql, id)
+	if err != nil {
+		return err
+	}
+
+	if !locked {
+		return errors.New("cannot acquire lock")
+	}
+
+	return nil
+}
+
+func (db *postgres) Unlock(ctx context.Context, id int) error {
+	const sql = `select pg_advisory_unlock=$1`
+
+	locked, err := db.mutex(ctx, sql, id)
+	if err != nil {
+		return err
+	}
+
+	if !locked {
+		return errors.New("cannot release lock")
+	}
+
+	return nil
 }
 
 func (db *postgres) Close() {
-	db.client.Close(context.Background())
+	db.Close()
+}
+
+func (db *postgres) mutex(ctx context.Context, sql string, id int) (bool, error) {
+	var locked bool
+
+	res, err := db.QueryOne(ctx, sql, id)
+	if err != nil {
+		return false, err
+	}
+
+	if err := res.(pgx.Row).Scan(&locked); err != nil {
+		return false, err
+	}
+
+	return locked, nil
 }
