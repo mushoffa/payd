@@ -49,8 +49,9 @@ func (db *postgres) QueryOne(ctx context.Context, sql string, args ...any) (any,
 }
 
 func (db *postgres) QueryMany(ctx context.Context, sql string, args ...any) (any, error) {
-	rows, err := db.client.Query(ctx, sql, args)
+	rows, err := db.client.Query(ctx, sql, args...)
 	if err != nil {
+		fmt.Println("err: ", err)
 		return nil, err
 	}
 	return rows, nil
