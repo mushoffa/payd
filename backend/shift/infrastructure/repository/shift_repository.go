@@ -12,15 +12,15 @@ import (
 )
 
 type shifts struct {
-	db database.DatabaseService[*pgx.Conn]
+	db database.DatabaseService
 }
 
-func NewShiftsRepository(db database.DatabaseService[*pgx.Conn]) domain.ShiftRepository {
+func NewShiftsRepository(db database.DatabaseService) domain.ShiftRepository {
 	return &shifts{db}
 }
 
-func (r *shifts) Create(shift *entity.Shift) (int, error) {
-	var id int
+func (r *shifts) Create(ctx context.Context, shift *entity.Shift) (int, error) {
+	const sql = `insert into shifts(date, start_time, end_time, role, location) values($1,$2,$3,$4,$5) returning id;`
 
 	date := shift.Date.Time()
 	start_time := shift.StartTime.Time()
@@ -28,24 +28,25 @@ func (r *shifts) Create(shift *entity.Shift) (int, error) {
 	role := shift.Role
 	location := shift.Location
 
-	sql := `insert into shifts(date, start_time, end_time, role, location) values($1,$2,$3,$4,$5) returning id;`
-	if err := r.conn().QueryRow(context.Background(), sql, date, start_time, end_time, role, location).Scan(&id); err != nil {
-		return 0, err
+	id, err := r.db.Insert(ctx, sql, date, start_time, end_time, role, location)
+	if err != nil {
+		return id, err
 	}
 
 	return id, nil
 }
 
-func (r *shifts) FindAll() ([]entity.Shift, error) {
+func (r *shifts) FindAll(ctx context.Context) ([]entity.Shift, error) {
 	var shifts []entity.Shift
 
-	sql := `select * from shifts order by date`
-	rows, err := r.conn().Query(context.Background(), sql)
+	const sql = `select * from shifts order by date`
+
+	rows, err := r.db.QueryMany(ctx, sql)
 	if err != nil {
 		return shifts, err
 	}
 
-	tables, err := pgx.CollectRows(rows, pgx.RowToStructByName[ShiftTable])
+	tables, err := pgx.CollectRows(rows.(pgx.Rows), pgx.RowToStructByName[ShiftTable])
 	if err != nil {
 		return shifts, err
 	}
@@ -67,16 +68,17 @@ func (r *shifts) FindAll() ([]entity.Shift, error) {
 	return shifts, nil
 }
 
-func (r *shifts) FindByID(id int) (entity.Shift, error) {
+func (r *shifts) FindByID(ctx context.Context, id int) (entity.Shift, error) {
 	var shift entity.Shift
 
-	sql := `select * from shifts where id=$1`
-	row, queryErr := r.conn().Query(context.Background(), sql, id)
-	if queryErr != nil {
-		return shift, queryErr
+	const sql = `select * from shifts where id=$1`
+
+	row, err := r.db.QueryMany(ctx, sql, id)
+	if err != nil {
+		return shift, err
 	}
 
-	table, err := pgx.CollectOneRow(row, pgx.RowToStructByName[ShiftTable])
+	table, err := pgx.CollectOneRow(row.(pgx.Rows), pgx.RowToStructByName[ShiftTable])
 	if err != nil {
 		return shift, err
 	}
@@ -98,19 +100,17 @@ func (r *shifts) FindByID(id int) (entity.Shift, error) {
 	return shift, nil
 }
 
-func (r *shifts) Update(shift *entity.Shift) error {
+func (r *shifts) Update(ctx context.Context, shift *entity.Shift) error {
 	return nil
 }
 
-func (r *shifts) Delete(id int) error {
-	sql := `delete from shifts where id=$1`
-	_, err := r.conn().Exec(context.Background(), sql, id)
+func (r *shifts) Delete(ctx context.Context, id int) error {
+	const sql = `delete from shifts where id=$1`
+
+	_, err := r.db.Exec(ctx, sql, id)
 	if err != nil {
 		return err
 	}
-	return nil
-}
 
-func (r *shifts) conn() *pgx.Conn {
-	return r.db.GetInstance()
+	return nil
 }
