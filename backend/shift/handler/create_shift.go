@@ -31,7 +31,7 @@ func (h *shift) create() fiber.Handler {
 			return err
 		}
 
-		id, err := h.r.Create(shift)
+		id, err := h.r.Create(c.Context(), shift)
 		if err != nil {
 			return err
 		}

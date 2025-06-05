@@ -11,7 +11,7 @@ func (h *shift) delete() fiber.Handler {
 			return h.BadRequest(c, "Invalid id format, must be numeric")
 		}
 
-		if err := h.r.Delete(id); err != nil {
+		if err := h.r.Delete(c.Context(), id); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(err.Error())
 		}
 

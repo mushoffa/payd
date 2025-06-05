@@ -6,7 +6,7 @@ import (
 
 func (h *shift) getAll() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		shifts, err := h.r.FindAll()
+		shifts, err := h.r.FindAll(c.Context())
 		if err != nil {
 			return err
 		}
