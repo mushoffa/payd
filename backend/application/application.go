@@ -10,17 +10,15 @@ import (
 	"payd/infrastructure/database"
 	"payd/infrastructure/http/server"
 	"payd/shift"
-
-	"github.com/jackc/pgx/v5"
 )
 
 type Application struct {
-	Database database.DatabaseService[*pgx.Conn]
+	Database database.DatabaseService
 	Server   http.HttpServer
 }
 
 func New() *Application {
-	db := database.NewPostgresClient("admin", "admin", "localhost", 5442, "payd", false)
+	db := database.NewPostgres("admin", "admin", "localhost", 5442, "payd", false)
 	return &Application{
 		Database: db,
 		Server:   http.NewServer(9095),
