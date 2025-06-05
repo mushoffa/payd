@@ -1,13 +1,15 @@
 package domain
 
 import (
+	"context"
+
 	"payd/shift/domain/entity"
 )
 
 type ShiftRepository interface {
-	Create(*entity.Shift) (int, error)
-	FindAll() ([]entity.Shift, error)
-	FindByID(int) (entity.Shift, error)
-	Update(*entity.Shift) error
-	Delete(int) error
+	Create(context.Context, *entity.Shift) (int, error)
+	FindAll(context.Context) ([]entity.Shift, error)
+	FindByID(context.Context, int) (entity.Shift, error)
+	Update(context.Context, *entity.Shift) error
+	Delete(context.Context, int) error
 }
