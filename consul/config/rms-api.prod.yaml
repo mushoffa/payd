@@ -1,0 +1,7 @@
+database:
+    url: "payd-db"
+    port: 5432
+    name: "payd"
+    ssl: "disable"
+    username: "admin"
+    password: "admin"

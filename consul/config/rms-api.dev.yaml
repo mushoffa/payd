@@ -1,0 +1,7 @@
+database:
+    url: "localhost"
+    port: 5442
+    name: "payd"
+    ssl: "disable"
+    username: "admin"
+    password: "admin"
