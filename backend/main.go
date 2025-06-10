@@ -2,9 +2,12 @@ package main
 
 import (
 	"payd/application"
+	"payd/config"
 )
 
 func main() {
-	app := application.New()
+	c := config.Get()
+
+	app := application.New(c)
 	app.Run()
 }

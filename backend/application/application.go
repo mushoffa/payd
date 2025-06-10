@@ -7,6 +7,7 @@ import (
 	"syscall"
 	"time"
 
+	"payd/config"
 	"payd/infrastructure/database"
 	"payd/infrastructure/http/server"
 	"payd/shift"
@@ -17,8 +18,8 @@ type Application struct {
 	Server   http.HttpServer
 }
 
-func New() *Application {
-	db := database.NewPostgres("admin", "admin", "localhost", 5442, "payd", false)
+func New(config *config.Config) *Application {
+	db := database.NewPostgres(config)
 	return &Application{
 		Database: db,
 		Server:   http.NewServer(9095),

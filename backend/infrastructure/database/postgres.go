@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 
+	"payd/config"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -13,16 +15,10 @@ type postgres struct {
 	client *pgxpool.Pool
 }
 
-func NewPostgres(username, password, url string, port int, dbName string, ssl bool) DatabaseService {
-	sslMode := "disable"
+func NewPostgres(config *config.Config) DatabaseService {
+	db := config.Database
 
-	if ssl {
-		sslMode = "enable"
-	}
-
-	db := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=%s", username, password, url, port, dbName, sslMode)
-
-	pool, err := pgxpool.New(context.Background(), db)
+	pool, err := pgxpool.New(context.Background(), db.String())
 	if err != nil {
 		panic(err)
 	}
