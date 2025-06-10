@@ -35,6 +35,16 @@ services:
     networks:
       - payd-net
 
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: payd-jaeger
+    restart: unless-stopped
+    ports:
+      - 14268:14268
+      - 16686:16686
+    networks:
+      - payd-net
+
   database:
     image: postgres
     container_name: payd-db
