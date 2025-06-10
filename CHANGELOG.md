@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/mushoffa/payd/compare/v0.1.0...v0.2.0) (2025-06-10)
+
+
+### Infrastructure
+
+* **consul:** Add container mount volume directory ([56df340](https://github.com/mushoffa/payd/commit/56df340091ea20f92e39ceb6a596f696dac9e76f))
+* **consul:** Add service container on docker-compose ([9d1c54f](https://github.com/mushoffa/payd/commit/9d1c54f1b208af29a5124157a32881d9e48085eb))
+
+
+### Backend
+
+* **application:** Refactor database service interface ([5a84956](https://github.com/mushoffa/payd/commit/5a84956e12b64855ff29d7c7550ac5cd085b1950))
+* **build:** Add viper dependency library ([5c766aa](https://github.com/mushoffa/payd/commit/5c766aa85674f79593ba34b947b817f56a71ac7f))
+* **build:** Bump dependency library ([574b3dd](https://github.com/mushoffa/payd/commit/574b3dd81d5e2238dfa3da803b085447db626e05))
+* **config:** Implement remote config provider on consul ([0bcdb78](https://github.com/mushoffa/payd/commit/0bcdb78e3f2e76ba0a64d8a21b503c2eb0b2b842))
+* **domain:** Add result object data type ([a59dd29](https://github.com/mushoffa/payd/commit/a59dd297930e8df2ccef480302ce4db55c1e78ad))
+* **infrastructure:** Fix params parsing on QueryMany function ([a1cee40](https://github.com/mushoffa/payd/commit/a1cee404f1c189d22bfd79b039c1d37764bfa08c))
+* **infrastructure:** Implement database interface on postgres client ([6460803](https://github.com/mushoffa/payd/commit/6460803de1eb275978a9db6a8219e75d0973e7fc))
+* **infrastructure:** Refactor database interface, remove generic type ([067cc8e](https://github.com/mushoffa/payd/commit/067cc8e4c6071febb0b80c1a7b3d79700fcdc5e7))
+* **shift:** Add context param on repository function ([ed64bc9](https://github.com/mushoffa/payd/commit/ed64bc9bce68e6e7a84635d1586ab5f0122f73e5))
+* **shift:** Parse context from http handler to repository function ([0349ec6](https://github.com/mushoffa/payd/commit/0349ec6698c058fe863614f6d9af0db58d428a91))
+* **shift:** Refactor database interface ([4af1555](https://github.com/mushoffa/payd/commit/4af155574ae1d3377eaad1dc949d4f2df888385a))
+* **shift:** Refactor database interface on shift repository ([9b76a27](https://github.com/mushoffa/payd/commit/9b76a27669a9bab73a799110b3f4e59d5d03195b))
+
 ## 0.1.0 (2025-06-04)
 
 
