@@ -24,6 +24,17 @@ services:
     networks:
       - payd-net
 
+  prometheus:
+    image: prom/prometheus
+    container_name: payd-prometheus
+    restart: unless-stopped
+    ports:
+      - 9091:9090
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - payd-net
+
   database:
     image: postgres
     container_name: payd-db
