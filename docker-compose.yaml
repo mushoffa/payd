@@ -45,6 +45,19 @@ services:
     networks:
       - payd-net
 
+  otel:
+    image: otel/opentelemetry-collector-contrib
+    container_name: payd-otel
+    restart: unless-stopped
+    command: --config /etc/otel-config.yml
+    ports:
+      - 4318:4318
+      - 8889:8889
+    volumes:
+      - ./otel/otel-config.yml:/etc/otel-config.yml
+    networks:
+      - payd-net
+
   database:
     image: postgres
     container_name: payd-db
