@@ -10,19 +10,24 @@ import (
 	"payd/config"
 	"payd/infrastructure/database"
 	"payd/infrastructure/http/server"
+	"payd/infrastructure/trace"
 	"payd/shift"
 )
 
 type Application struct {
 	Database database.DatabaseService
 	Server   http.HttpServer
+	Tracer   trace.TracerService
 }
 
 func New(config *config.Config) *Application {
 	db := database.NewPostgres(config)
+	tracer := trace.NewOpenTelemetry(config)
+
 	return &Application{
 		Database: db,
 		Server:   http.NewServer(9095),
+		Tracer:   tracer,
 	}
 }
 
@@ -37,8 +42,12 @@ func (a *Application) Run() {
 }
 
 func (a *Application) start() {
-	s := shift.New(a.Database)
-	a.Server.AddRoute("/shifts", s)
+	shift_feat := shift.New(a.Database)
+	a.Server.AddRoutes(
+		shift_feat.Handler().RegisterV1,
+		shift_feat.Handler().RegisterV2,
+	)
+
 	go a.Server.Start()
 }
 
