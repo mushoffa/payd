@@ -2,6 +2,7 @@ package http
 
 import (
 	"payd/infrastructure/http/server/middleware"
+	"payd/infrastructure/trace/embedded"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -15,6 +16,7 @@ type response struct {
 }
 
 type FiberHandler struct {
+	embedded.Monitor
 }
 
 func (h *FiberHandler) ValidateBody(c *fiber.Ctx, body interface{}) error {
