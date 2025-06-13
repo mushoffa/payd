@@ -9,7 +9,26 @@ import (
 )
 
 type Config struct {
+	App      App      `yaml:"app"`
+	Otel     Otel     `yaml:"otel"`
 	Database Database `yaml:"database"`
+}
+
+func (c *Config) Version() string {
+	return Version
+}
+
+type App struct {
+	Name string `yaml:"name"`
+}
+
+type Otel struct {
+	Host string `yaml:"host"`
+	Port int    `yaml:"port"`
+}
+
+func (otel Otel) String() string {
+	return fmt.Sprintf("%s:%d", otel.Host, otel.Port)
 }
 
 type Database struct {
