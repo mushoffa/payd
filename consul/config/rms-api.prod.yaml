@@ -1,3 +1,10 @@
+app:
+    name: "RMS API"
+
+otel:
+    host: "payd-otel"
+    port: 4318
+
 database:
     url: "payd-db"
     port: 5432
