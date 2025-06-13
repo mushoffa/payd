@@ -2,8 +2,10 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"payd/infrastructure/database"
+	"payd/infrastructure/trace/embedded"
 	"payd/shift/domain/entity"
 	"payd/shift/domain/repository"
 	"payd/shift/domain/valueobject"
@@ -12,14 +14,20 @@ import (
 )
 
 type shifts struct {
+	embedded.Monitor
 	db database.DatabaseService
 }
 
 func NewShiftsRepository(db database.DatabaseService) domain.ShiftRepository {
-	return &shifts{db}
+	r := &shifts{db: db}
+	r.Init()
+	return r
 }
 
 func (r *shifts) Create(ctx context.Context, shift *entity.Shift) (int, error) {
+	childCtx, span := r.Trace(ctx, "Repository.Create")
+	defer span.End()
+
 	const sql = `insert into shifts(date, start_time, end_time, role, location) values($1,$2,$3,$4,$5) returning id;`
 
 	date := shift.Date.Time()
@@ -28,7 +36,7 @@ func (r *shifts) Create(ctx context.Context, shift *entity.Shift) (int, error) {
 	role := shift.Role
 	location := shift.Location
 
-	id, err := r.db.Insert(ctx, sql, date, start_time, end_time, role, location)
+	id, err := r.db.Insert(childCtx, sql, date, start_time, end_time, role, location)
 	if err != nil {
 		return id, err
 	}
@@ -37,11 +45,14 @@ func (r *shifts) Create(ctx context.Context, shift *entity.Shift) (int, error) {
 }
 
 func (r *shifts) FindAll(ctx context.Context) ([]entity.Shift, error) {
+	childCtx, span := r.Trace(ctx, "Repository.FindAll")
+	defer span.End()
+
 	var shifts []entity.Shift
 
 	const sql = `select * from shifts order by date`
 
-	rows, err := r.db.QueryMany(ctx, sql)
+	rows, err := r.db.QueryMany(childCtx, sql)
 	if err != nil {
 		return shifts, err
 	}
@@ -69,11 +80,13 @@ func (r *shifts) FindAll(ctx context.Context) ([]entity.Shift, error) {
 }
 
 func (r *shifts) FindByID(ctx context.Context, id int) (entity.Shift, error) {
-	var shift entity.Shift
+	childCtx, span := r.Trace(ctx, "Repository.FindByID", r.Attribute("shift.id", fmt.Sprintf("%d", id)))
+	defer span.End()
 
+	var shift entity.Shift
 	const sql = `select * from shifts where id=$1`
 
-	row, err := r.db.QueryMany(ctx, sql, id)
+	row, err := r.db.QueryMany(childCtx, sql, id)
 	if err != nil {
 		return shift, err
 	}
