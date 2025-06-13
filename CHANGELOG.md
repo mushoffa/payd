@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.3.0](https://github.com/mushoffa/payd/compare/v0.2.0...v0.3.0) (2025-06-13)
+
+
+### Infrastructure
+
+* **jaeger:** Add new docker service container ([dc050b1](https://github.com/mushoffa/payd/commit/dc050b1db8ecd01b68a6d7920b7f00632f20407a))
+* **otel:** Add new open telemety collector docker service container ([6256a9e](https://github.com/mushoffa/payd/commit/6256a9edf0a5400d0dadf00ab260387b9041e5e4))
+* **prometheus:** Add new docker service container ([cbc47f1](https://github.com/mushoffa/payd/commit/cbc47f1d1752ba88382c2422684b174855ab6d09))
+* **prometheus:** Change rms-api job port setting ([aedc462](https://github.com/mushoffa/payd/commit/aedc462c715658bc1db97b5eac3d0b84f65e71e4))
+
+
+### Backend
+
+* **application:** Instantiate tracer client ([7c7fa24](https://github.com/mushoffa/payd/commit/7c7fa240e8b7ad5ca1af0fc23d77e032433d861a))
+* **build:** Bump dependency library ([9ed38d3](https://github.com/mushoffa/payd/commit/9ed38d39cc53ede2d40a879adc72f64485b10a6e))
+* **config:** Add open telemetry config data structure ([6fec2ec](https://github.com/mushoffa/payd/commit/6fec2ec83681348cdf8634050f3cdc2ad71a8040))
+* **infrastructure:** Add new function for adding middleware & router on server ([40bc552](https://github.com/mushoffa/payd/commit/40bc552526cb7bc05f4042d706f7bb4d27ff4acb))
+* **infrastructure:** Add open telemetry client ([8c080f6](https://github.com/mushoffa/payd/commit/8c080f66dd39f501013c268f40fdd23622c8f48b))
+* **infrastructure:** Implement embedded tracer function on fiber handler ([5e552ec](https://github.com/mushoffa/payd/commit/5e552ec264c3bf815ae37868ca08286f34065a07))
+* **infrastructure:** Implement embedded tracer function on postgres client ([9c94b9d](https://github.com/mushoffa/payd/commit/9c94b9d839479d62cd56e7c95910cd9467852776))
+* **shift:** Add api endpoint and route registration function ([1690545](https://github.com/mushoffa/payd/commit/16905454d75f71aba7515f88cb7e964c063c8d31))
+* **shift:** Add handler function to register router on http server ([2331a03](https://github.com/mushoffa/payd/commit/2331a03dadd340c236fd6e1cf0620b329b42a20e))
+* **shift:** Implement embedded tracer function on shift query handler ([ae32a42](https://github.com/mushoffa/payd/commit/ae32a4247950d34b37e1aa0ece7c83ffa99ba96e))
+* **shift:** Implement embedded tracer function on shift repository ([80f002a](https://github.com/mushoffa/payd/commit/80f002ab90e408b325bb14efe4bc4df64c563230))
+
 ## [0.2.0](https://github.com/mushoffa/payd/compare/v0.1.0...v0.2.0) (2025-06-10)
 
 
