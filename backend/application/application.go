@@ -32,13 +32,18 @@ func New(config *config.Config) *Application {
 }
 
 func (a *Application) Run() {
+	shutdown, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGTSTP)
+	defer stop()
+
 	a.start()
 
-	<-a.wait()
+	<-shutdown.Done()
 
-	stopCtx, stopCancellation := context.WithTimeout(context.Background(), time.Second*20)
-	defer stopCancellation()
-	a.stop(stopCtx)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	a.stop(ctx)
+	os.Exit(0)
 }
 
 func (a *Application) start() {
@@ -51,16 +56,8 @@ func (a *Application) start() {
 	go a.Server.Start()
 }
 
-func (a *Application) wait() <-chan os.Signal {
-	// Create channel to signify a signal being sent
-	c := make(chan os.Signal, 1)
-
-	// When an interrupt or termination signal is sent, notify the channel
-	signal.Notify(c, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-
-	return c
-}
-
 func (a *Application) stop(ctx context.Context) {
 	a.Server.Shutdown(ctx)
+	a.Database.Close()
+	a.Tracer.Shutdown(ctx)
 }

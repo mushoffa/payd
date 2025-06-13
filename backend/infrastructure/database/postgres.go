@@ -117,7 +117,7 @@ func (db *postgres) Unlock(ctx context.Context, id int) error {
 }
 
 func (db *postgres) Close() {
-	db.Close()
+	db.client.Close()
 }
 
 func (db *postgres) mutex(ctx context.Context, sql string, id int) (bool, error) {
