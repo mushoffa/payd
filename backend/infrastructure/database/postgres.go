@@ -6,12 +6,15 @@ import (
 	"fmt"
 
 	"payd/config"
+	"payd/infrastructure/trace/embedded"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	semconv "go.opentelemetry.io/otel/semconv/v1.32.0"
 )
 
 type postgres struct {
+	embedded.Monitor
 	client *pgxpool.Pool
 }
 
@@ -23,11 +26,24 @@ func NewPostgres(config *config.Config) DatabaseService {
 		panic(err)
 	}
 
-	return &postgres{pool}
+	pg := &postgres{
+		client: pool,
+	}
+
+	pg.Init(
+		semconv.DBSystemNamePostgreSQL,
+		semconv.ServerAddressKey.String(db.URL),
+		semconv.ServerPortKey.String(fmt.Sprintf("%d", db.Port)),
+	)
+
+	return pg
 }
 
 func (db *postgres) Insert(ctx context.Context, sql string, args ...any) (int, error) {
 	var id int
+
+	_, span := db.Trace(ctx, "Database.Insert")
+	defer span.End()
 
 	row, err := db.QueryOne(ctx, sql, args)
 	if err != nil {
@@ -40,20 +56,28 @@ func (db *postgres) Insert(ctx context.Context, sql string, args ...any) (int, e
 }
 
 func (db *postgres) QueryOne(ctx context.Context, sql string, args ...any) (any, error) {
+	_, span := db.Trace(ctx, "Database.QueryOne")
+	defer span.End()
+
 	row := db.client.QueryRow(ctx, sql, args)
 	return row, nil
 }
 
 func (db *postgres) QueryMany(ctx context.Context, sql string, args ...any) (any, error) {
+	_, span := db.Trace(ctx, "Database.QueryMany")
+	defer span.End()
+
 	rows, err := db.client.Query(ctx, sql, args...)
 	if err != nil {
-		fmt.Println("err: ", err)
 		return nil, err
 	}
 	return rows, nil
 }
 
 func (db *postgres) Exec(ctx context.Context, sql string, args ...any) (any, error) {
+	_, span := db.Trace(ctx, "Database.Exec")
+	defer span.End()
+
 	res, err := db.client.Exec(ctx, sql, args)
 	if err != nil {
 		return nil, err
