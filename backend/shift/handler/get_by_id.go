@@ -6,12 +6,15 @@ import (
 
 func (h *shift) getByID() fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		childCtx, span := h.Trace(c.UserContext(), "Controller.GetByID")
+		defer span.End()
+
 		id, err := c.ParamsInt("id")
 		if err != nil {
 			return h.BadRequest(c, "Invalid id format, must be numeric")
 		}
 
-		shift, err := h.r.FindByID(c.Context(), id)
+		shift, err := h.r.FindByID(childCtx, id)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Data not found"})
 		}

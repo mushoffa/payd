@@ -6,7 +6,10 @@ import (
 
 func (h *shift) getAll() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		shifts, err := h.r.FindAll(c.Context())
+		childCtx, span := h.Trace(c.UserContext(), "Controller.GetAll")
+		defer span.End()
+
+		shifts, err := h.r.FindAll(childCtx)
 		if err != nil {
 			return err
 		}
